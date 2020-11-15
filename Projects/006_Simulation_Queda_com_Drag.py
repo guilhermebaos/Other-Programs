@@ -84,27 +84,24 @@ jerk = [j]
 
 # Loop para ir calculando os vários valores ao fim de cada intervalo de tempo definido pelo utilizador
 while True:
-    d_t = p ** (-1)  # Intervalo de tempo = 1/(pontos por segundo) -> d_t = Delta t
-    t += d_t  # Instante de tempo a que correspondem os valores calculados
-    Fd = drag(v, A)  # Calcular o drag de acordo com o Vf do intervalo anteriormente calculado
-    Fr = P - Fd  # Calcular o módulo da resultante de forças
-    a = Fr / m  # Calcular o módulo da aceleração
-    x = position(x, v, a, d_t)  # Calcular o Xf de acrdo com o Xf e Vf do instante anterior e a aceleração deste
-    v = velocity(v, a, d_t)  # Calcular o Vf de acordo com o Vf do instante anterior e a aceleração deste
-    if len(acc) <= 2:
-        j = 0
-    else:
-        j = (a - acc[-2]) / (t - tim[-2])  # Calcular o J usando (y2 - y1) / (x2 - x1), para dois pontos consecutivos
-    tim += [t]  # Guardar o t atual
-    pos += [x]  # Guardar o Xf deste instante
-    vel += [v]  # Guardar o Vf deste instante
-    acc += [a]  # Guardar o a deste instante
-    jerk += [j]  # Guardar o j deste instante (mais corretamente, o Jm)
+    d_t = p ** (-1)     # Intervalo de tempo = 1/(pontos por segundo) -> d_t = Delta t
+    t += d_t            # Instante de tempo a que correspondem os valores calculados
+    Fd = drag(v, A)     # Calcular a Resistência do Ar de acordo com o Vf do intervalo anteriormente calculado
+    Fr = P - Fd         # Calcular o módulo da resultante de forças
+    a = Fr / m          # Calcular o módulo da aceleração
+    x = position(x, v, a, d_t)      # Calcular o Xf de acrdo com o Xf e Vf do instante anterior e a aceleração deste
+    v = velocity(v, a, d_t)         # Calcular o Vf de acordo com o Vf do instante anterior e a aceleração deste
+    j = (a - acc[-1]) / (t - tim[-1])  # Calcular o J usando (y2 - y1) / (x2 - x1), para dois pontos consecutivos
+    tim += [t]      # Guardar o t atual
+    pos += [x]      # Guardar o Xf deste instante
+    vel += [v]      # Guardar o Vf deste instante
+    acc += [a]      # Guardar o a deste instante
+    jerk += [j]     # Guardar o j deste instante (mais corretamente, o Jm)
     # print(t, x, v, a, j) -> Usado para ver se está tudo bem com os valores ao longo do tempo
-    if x > h:  # Parar quando o objeto chegar ao chão
+    if x >= h:  # Parar quando o objeto chegar ao chão
         break
 
-# Fazer os gráficos, aparecem um de cada vez
+# Fazer os gráficos aparecer um de cada vez
 plt.plot(tim, pos)
 plt.show()
 plt.plot(tim, vel)
@@ -120,3 +117,9 @@ tit('Gráfico Final:')
 print('Azul: x(t) \nVerde: v(t) \nVermelho: a(t) \nCiano: j(t)')
 plt.plot(tim, pos, '-b', tim, vel, '-g', tim, acc, '-r', tim, jerk, '-c')
 plt.show()
+
+print(tim)
+print(pos)
+print(vel)
+print(acc)
+print(jerk)

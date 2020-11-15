@@ -185,6 +185,9 @@ dts_dis = []  # Guarda os vários delta t de disparo
 while True:
     if ((math.sin(ang) * vel_bal) ** 2 - 2 * g * alt_avi) < 0:
         ang += rel_tim / 1000
+        if ang > ang_max:
+            print('É impossível a bala atingir o avião!')
+            break
         continue
     dt_dis = (math.sin(ang) * vel_bal - ((math.sin(
         ang) * vel_bal) ** 2 - 2 * g * alt_avi) ** 0.5) / g  # Tempo que a bala demora a chegar à altitude do avião
@@ -205,7 +208,7 @@ while True:
                 dt_dis = (math.sin(ang) * vel_bal - ((math.sin(ang) * vel_bal) ** 2 - 2 * g * alt_avi) ** 0.5) / g
                 dx_dis = math.cos(ang) * vel_bal * dt_dis
                 t_dis = (alc_rad - dx_dis) / vel_avi - dt_dis
-                if t_dis < (ts_dis[-1] + rel_tim):
+                if t_dis < (ts_dis[-1] + rel_tim):  # A arma já recarregou
                     ts_dis += [t_dis_anterior]
                     ang_dis += [ang_anterior]
                     dts_dis += [dt_dis_anterior]
@@ -220,16 +223,16 @@ while True:
     else:
         ang += rel_tim / 1000
 
-# Elimina o tempo negativo, colocado para generalizar o processo
+# Elimina o tempo negativo, necessário para poder fazer ts_dis[-1] + rel_tim a qualquer momento
 ts_dis.pop(0)
 
-# Calcular o desvio em relação ao avião
+# Calcular os desvios em relação ao avião de todos os disparos
 desvios = []
 for t, tv, a in zip(ts_dis, dts_dis, ang_dis):
-    x_bal = math.cos(a) * vel_bal * tv
-    y_bal = math.sin(a) * vel_bal * tv - 0.5 * g * (tv ** 2)
-    x_avi = alc_rad - vel_avi * (t + tv)
-    y_avi = alt_avi
+    x_bal = math.cos(a) * vel_bal * tv                              # Lei xt da bala
+    y_bal = math.sin(a) * vel_bal * tv - 0.5 * g * (tv ** 2)        # Lei yt da bala
+    x_avi = alc_rad - vel_avi * (t + tv)                            # Lei xt avião
+    y_avi = alt_avi                                                 # Lei yt avião
     dx = x_bal - x_avi
     dy = y_bal - y_avi
     desvios += [[dx, dy]]
@@ -243,16 +246,18 @@ for t, dt, a in zip(ts_dis, dts_dis, ang_dis):
     print(
         f'O {c}º tiro será disparado {t:.2f}s após o avião ser detetado, a um ângulo de {a:.1f}°, demorando {dt:.2f}s a atingir o avião.')
 
-visualize = inputthis('\n\nQuer ver a trajetória de de algum dos tiros [S/N]? ', ('S', 'N'))
+visualize = inputthis('\n\nQuer ver a trajetória de de algum dos tiros [S/N]? ', ('S', 'N', 's', 'n'))
 
 for c1 in range(0, len(ang_dis)):  # Converter de volta para radianos
     ang_dis[c1] = math.radians(ang_dis[c1])
 
+visualize = visualize.upper()
 if visualize == 'S':
     while True:
         shot = inputint('\nDigite o número do tiro que quer ver (escreva 0 para terminar): ')
         if shot > c:
             print(f'\nSó ocorreram {c} disparos!\n\n')
+            continue
         elif shot == 0:
             break
         else:
@@ -266,16 +271,16 @@ if visualize == 'S':
             while True:
                 x_pos += [math.cos(ang_shot) * vel_bal * t_elapsed]
                 y_pos += [math.sin(ang_shot) * vel_bal * t_elapsed - 0.5 * g * (t_elapsed ** 2)]
-                if t_elapsed >= max_time:
+                if y_pos[-1] <= 0 and len(y_pos) != 1:
                     break
                 t_elapsed += inc
 
-        ani_frames = 200
+        ani_frames = len(x_pos) - 1
         Writer = animation.writers['ffmpeg']
         writer = Writer(fps=60, metadata=dict(artist='Me'), bitrate=2000)
         image = plt.figure()
-        plt.xlim(0, max(x_pos))
-        plt.ylim(0, max(y_pos))
+        plt.xlim(0, max(x_pos)*1.05)
+        plt.ylim(0, max(y_pos)*1.05)
         plt.xlabel('Componente escalar da posição na horizontal')
         plt.ylabel('Componente escalar da posição na vertical')
         plt.title('Trajetória da bala')
@@ -285,5 +290,5 @@ if visualize == 'S':
             snsplot = sns.lineplot(x=x_pos[:i + 1], y=y_pos[:i + 1], color='r')
 
 
-        ani = animation.FuncAnimation(image, animate, frames=ani_frames, repeat=True)
+        ani = animation.FuncAnimation(image, animate, frames=ani_frames, interval=5, repeat=True)
         plt.show()
