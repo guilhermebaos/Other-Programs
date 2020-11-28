@@ -1,4 +1,5 @@
-# From Computerphile at: https://www.youtube.com/watch?v=mCML2B94rUg
+# Generate patterns using Random Boolean Networks
+# Inspired by Computerphile: https://www.youtube.com/watch?v=mCML2B94rUg
 
 from random import choice, randint
 
