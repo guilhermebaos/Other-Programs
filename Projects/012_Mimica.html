@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Mímica</title>
+    <link rel="stylesheet" href="012_Mimica.css">
+    <script defer src="012_Mimica.js"></script>
+</head>
+<body>
+    <main>
+        <h1>Jogo da Mímica</h1>
+        <div>
+            <div class="btns">
+                <button id="equipa1" class="select-team" onclick="mudarEquipa(1)">Equipa 1: <span id="pontos1">0</span></button><button id="equipa2" onclick="mudarEquipa(2)">Equipa 2: <span id="pontos2">0</span></button>
+            </div>
+            <div id="palavra" class="palavra">
+                Palavra
+            </div>
+            <div class="btns">
+                <button id="shuffle" onclick="baralharpalavras()">SHUFFLE</button><button id="prev" onclick="mudarPalavra(-1)">PREV</button><button id="next" onclick="mudarPalavra(1)">NEXT</button>
+            </div>
+        </div>
+
+        <div class="container-timer">
+            <p>Tempo restante: <span id="tempo-restante" style="margin: 0px;">60</span>s</p> <button onclick="startTimer()">START</button>
+        </div>
+
+        <div class="container-input-palavra">
+            <label for="input-palavra" class="lista-palavras">Palavra:</label>
+            <input id="input-palavra" name="input-palavra" type="text">
+            <button onclick="enviar()">Enviar!</button>
+        </div>
+    </main>
+</body>
+</html>
